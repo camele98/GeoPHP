@@ -167,6 +167,11 @@ class PolygonTest extends \PHPUnit\Framework\TestCase {
             new Point(2, 3)
         );
 
+        $line3 = new Line(
+            new Point(1, -1),
+            new Point(2, 1)
+        );
+
         // With Point
         $this->assertTrue($polygon1->containsPoint(new Point(2, 2)));
         $this->assertTrue($polygon1->containsPoint(new Point(4, 4)));
@@ -178,6 +183,7 @@ class PolygonTest extends \PHPUnit\Framework\TestCase {
         // With Line
         $this->assertTrue($polygon1->containsLine($line1));
         $this->assertFalse($polygon1->containsLine($line2));
+        $this->assertFalse($polygon5->containsLine($line3)); // A line as a side of a polygon
 
         // With Polygon
         $this->assertTrue($polygon1->containsPolygon($polygon3));
@@ -222,16 +228,86 @@ class PolygonTest extends \PHPUnit\Framework\TestCase {
             new Point(-1.5, -5.5),
         ]);
 
+        $polygon5 = new Polygon([
+            new Point(0, 4),
+            new Point(0, 0),
+            new Point(-1, -2),
+            new Point(0, 4),
+        ]);
+
+        $polygon6 = new Polygon([
+            new Point(0, 4),
+            new Point(0, 5),
+            new Point(2, 5),
+            new Point(0, 4),
+        ]);
+
+        $polygon7 = new Polygon([
+            new Point(0, 4),
+            new Point(0, 5),
+            new Point(-1.43, 5),
+            new Point(0, 4),
+        ]);
+
+        $polygon8 = new Polygon([
+            new Point(-0.2248, 0.23657),
+            new Point(0, 5),
+            new Point(2.0001, 5),
+            new Point(-3.2885, 1),
+            new Point(-0.2248, 0.23657),
+        ]);
+
+        $polygon9 = new Polygon([
+            new Point(-8.5678, 6.00001),
+            new Point(8, 6),
+            new Point(8,0),
+            new Point(0, -9.4376535),
+            new Point(-13.6999039773659, -8.7824007899917),
+            new Point(-8.5678, 6.00001),
+        ]); // Polygon with vertices in the 4 quadrants
+
+        $polygon10 = new Polygon([
+            new Point(-8.5679, 6.00002),
+            new Point(-8.568, 6.00003),
+            new Point(-8.569, 6.00004),
+            new Point(-8.5691, 6.00004),
+            new Point(-8.5679, 6.00002),
+        ]); // Polygon very small
+
+        $polygon11 = new Polygon([
+            new Point(-10.6904785241294, -10.6080601745131),
+            new Point(0,9.5),
+            new Point(7.5791315022107, -6.7342746674955),
+            new Point(-10.6904785241294, -10.6080601745131),
+        ]);
+
+        // Lines
+        $line4= new line(
+            new point (-4,4),
+            new point (5,4),
+        );
+
         // With Point
         $this->assertTrue($polygon1->intersectsPoint(new Point(3, 4)));
         $this->assertFalse($polygon1->intersectsPoint(new Point(5, 4)));
 
-        // With lines is already tested in LineTest
+        // With lines
+        $this->assertTrue($polygon1->intersectsLine($line4)); // Side of the polygon as part of a line
+        $this->assertTrue($polygon11->intersectsLine($line4)); // Multiple intersections
+        $this->assertFalse($polygon9->intersectsLine($line4)); // No intersections
 
         // With Polygon
-        $this->assertTrue($polygon1->intersectsPolygon($polygon3));
-        $this->assertTrue($polygon4->intersectsPolygon($polygon2));
+        $this->assertTrue($polygon1->intersectsPolygon($polygon3)); 
+        $this->assertTrue($polygon3->intersectsPolygon($polygon1)); // Multiple intersections
+        $this->assertTrue($polygon4->intersectsPolygon($polygon2)); // Intersection of polygons in a point of one side
         $this->assertFalse($polygon1->intersectsPolygon($polygon2));
         $this->assertFalse($polygon3->intersectsPolygon($polygon2));
+        $this->assertTrue($polygon5->intersectsPolygon($polygon6)); // Intersection of polygons in vertices
+        $this->assertTrue($polygon6->intersectsPolygon($polygon7)); // Two polygons with the same side
+        $this->assertTrue($polygon8->intersectsPolygon($polygon8)); // Polygon that intersects itself
+        $this->assertTrue($polygon8->intersectsPolygon($polygon5)); 
+        $this->assertFalse($polygon9->intersectsPolygon($polygon5)); // Enormous polygon
+        $this->assertFalse($polygon9->intersectsPolygon($polygon10)); // Very small polygon; minimum distance between polygons without intersection
+        $this->assertTrue($polygon11->intersectsPolygon($polygon9)); // Intersection of polygons in the 4 quadrants
     }
 }
